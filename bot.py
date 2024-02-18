@@ -44,17 +44,26 @@ class States(StatesGroup):
 
 @dp.message(Command("start"))
 async def cmd_start(message: Message):
+    """
+    Стартовая команда
+    """
     await message.answer("Привет! Чтобы узнать доступные команды, введи /help")
 
 
 @dp.message(Command('help'))
 async def help_info(message: Message):
+    """
+    Помощь: вывод доступных команд
+    """
     await message.answer('/metrics - метрики модели \n'
                          '/detect - детектирование объектов на снимке')
 
 
 @dp.message(Command('metrics'))
 async def analitics_show(message: Message):
+    """
+    Показывает метрики модели
+    """
     album_builder = MediaGroupBuilder(
         caption="Метрики модели"
     )
@@ -69,12 +78,18 @@ async def analitics_show(message: Message):
 
 @router.message(Command('detect'))
 async def beginning(message: Message, state: FSMContext):
+    """
+    Начало детектирования
+    """
     await message.answer(text='Загрузите изображение:')
     await state.set_state(States.upload_photo)
 
 
 @router.message(States.upload_photo, F.photo)
 async def upload_photo(message: Message, state: FSMContext, bot: Bot):
+    """
+    Загрузка изображения
+    """
     await bot.download(
                         message.photo[-1],
                         destination='photo/image.jpg'
@@ -85,6 +100,9 @@ async def upload_photo(message: Message, state: FSMContext, bot: Bot):
 
 @router.message(States.choose_conf, F.text)
 async def def_conf(message: Message, state: FSMContext):
+    """
+    Ввод порога уверенности
+    """
     global conf
     try:
         float(message.text)
@@ -103,6 +121,9 @@ async def def_conf(message: Message, state: FSMContext):
 
 @router.message(States.start_detect, F.text.lower() == 'да')
 async def detection(message: Message, state: FSMContext):
+    """
+    Детектирование объектов (если пользователь согласился)
+    """
     global model, conf
     model.conf = conf
     await message.answer(
@@ -120,6 +141,9 @@ async def detection(message: Message, state: FSMContext):
 
 @router.message(States.start_detect, F.text.lower() == 'нет')
 async def no_detection(message: Message, state: FSMContext):
+    """
+    Ручка, если пользователь отказался проводить детектирование
+    """
     await message.answer(
         text='Жаль!',
         reply_markup=ReplyKeyboardRemove())
