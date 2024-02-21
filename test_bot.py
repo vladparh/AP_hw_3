@@ -78,15 +78,6 @@ async def test_def_conf_3():
 
 
 @pytest.mark.asyncio
-async def test_def_conf_3():
-    requester = MockedBot(request_handler=MessageHandler(def_conf, state=States.choose_conf))
-    requester.add_result_for(SendMessage, ok=True)
-    calls = await requester.query(MESSAGE.as_object(text='Пять'))
-    answer_message = calls.send_message.fetchone().text
-    assert answer_message == 'Это не число'
-
-
-@pytest.mark.asyncio
 async def test_no_detection():
     requester = MockedBot(request_handler=MessageHandler(no_detection, state=States.start_detect))
     requester.add_result_for(SendMessage, ok=True)
